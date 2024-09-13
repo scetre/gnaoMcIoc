@@ -1,0 +1,60 @@
+# 
+#
+
+record(bi, "$(P):bGreenInd") {
+    field(DESC, "bi record monitoring led 1")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@asyn($(PORT) 0 0) BOOL R P=$(ADS_PORT) V=GVL_EPICS.bGreenInd")
+    field(ZNAM, "Zero")
+    field(ONAM, "One")
+    field(UDFS, "NO_ALARM")
+}
+
+record(bi, "$(P):bRedInd") {
+    field(DESC, "bi record monitoring led 2")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@asyn($(PORT) 0 0) BOOL R P=$(ADS_PORT) V=GVL_EPICS.bRedInd")
+    field(ZNAM, "Zero")
+    field(ONAM, "One")
+    field(UDFS, "NO_ALARM")
+}
+
+record(bo, "$(P):bSwitch1") {
+    field(DESC, "bo record controlling switch 1")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=$(ADS_PORT) V=GVL_EPICS.bSwitch1")
+    field(ZNAM, "Zero")
+    field(ONAM, "One")
+    field(UDFS, "NO_ALARM")
+}
+
+record(bo, "$(P):bSwitch2") {
+    field(DESC, "bo record controlling switch 2")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=$(ADS_PORT) V=GVL_EPICS.bSwitch2")
+    field(ZNAM, "Zero")
+    field(ONAM, "One")
+    field(UDFS, "NO_ALARM")
+}
+
+record(ai, "$(P):rTemperatureSensor1") {
+    field(DESC, "ai record tmonitoring temperature sensor 1")
+    field(PREC, "2")
+    field(DTYP, "asynFloat64")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@asyn($(PORT) 0 0) REAL R P=$(ADS_PORT) V=GVL_EPICS.rTemperatureSensor1")
+    field(UDFS, "NO_ALARM")
+}
+
+record(ai, "$(P):rTemperatureSensor2") {
+    field(DESC, "ai record tmonitoring temperature sensor 2")
+    field(PREC, "2")
+    field(DTYP, "asynFloat64")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@asyn($(PORT) 0 0) REAL R P=$(ADS_PORT) V=GVL_EPICS.rTemperatureSensor2")
+    field(UDFS, "NO_ALARM")
+}
+
+

@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2022 Cosylab d.d.
+#
+# SPDX-License-Identifier: MIT
+
+global {PORT="$(PORT)"}
+global {ADS_PORT="PLC_TC3"}
+
+file "gnaoTest.db" {
+    pattern { "P" }
+        { "$(P)" }
+}
+

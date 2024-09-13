@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>674</width>
+    <height>385</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caLed" name="caled">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>110</y>
+      <width>71</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="ledWidth">
+     <number>35</number>
+    </property>
+    <property name="ledHeight">
+     <number>35</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string>ADS-GNAOMC:bRedInd</string>
+    </property>
+   </widget>
+   <widget class="caLed" name="caled_2">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>110</y>
+      <width>71</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="ledWidth">
+     <number>35</number>
+    </property>
+    <property name="ledHeight">
+     <number>35</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ADS-GNAOMC:bGreenInd</string>
+    </property>
+    <property name="trueColor">
+     <color>
+      <red>0</red>
+      <green>255</green>
+      <blue>0</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caToggleButton" name="catogglebutton">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>210</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>SW 1</string>
+    </property>
+    <property name="icon">
+     <iconset theme="fusion">
+      <normaloff>.</normaloff>.</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="channel" stdset="0">
+     <string>ADS-GNAOMC:bSwitch1</string>
+    </property>
+    <property name="styleSheet" stdset="0">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>110</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ADS-GNAOMC:rTemperatureSensor1</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_2">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>180</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ADS-GNAOMC:rTemperatureSensor2</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_14">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>40</y>
+      <width>151</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="../../../../../usr/local/epics/caqtdm/caQtDM_QtControls/qtcontrols.qrc">:/pixmaps/AstralisLogo.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_3">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>120</y>
+      <width>151</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="../../../../../usr/local/epics/caqtdm/caQtDM_QtControls/qtcontrols.qrc">:/pixmaps/AlpaoLogo.jpg</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_13">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>200</y>
+      <width>151</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="../../../../../usr/local/epics/caqtdm/caQtDM_QtControls/qtcontrols.qrc">:/pixmaps/LAMLogo.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_15">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>280</y>
+      <width>151</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="../../../../../usr/local/epics/caqtdm/caQtDM_QtControls/qtcontrols.qrc">:/pixmaps/OneraLogo.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caToggleButton" name="catogglebutton_2">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>210</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>SW 2</string>
+    </property>
+    <property name="icon">
+     <iconset theme="fusion">
+      <normaloff>.</normaloff>.</iconset>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ADS-GNAOMC:bSwitch2</string>
+    </property>
+    <property name="styleSheet" stdset="0">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>80</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Temerature Sensor 1</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>150</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Temerature Sensor 2</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caToggleButton</class>
+   <extends>QCheckBox</extends>
+   <header>caToggleButton</header>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caLed</class>
+   <extends>QWidget</extends>
+   <header>caLed</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../../../usr/local/epics/caqtdm/caQtDM_QtControls/qtcontrols.qrc"/>
+  <include location="../../../../usr/local/epics/caqtdm/caQtDM_QtControls/qtcontrols.qrc"/>
+ </resources>
+ <connections/>
+</ui>
