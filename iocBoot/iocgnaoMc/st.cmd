@@ -2,14 +2,20 @@
 
 < envPaths
 
-cd "${TOP}"
+## Set EPICS_DB_INCLUDE_PATH to help find .dbd files
+epicsEnvSet("EPICS_DB_INCLUDE_PATH", "$(MOTOR)/dbd:$(EPICS_BASE)/dbd")
 
 ## Register all support components
+dbLoadDatabase "$(EPICS_BASE)/dbd/base.dbd"
+dbLoadDatabase "$(MOTOR)/dbd/motorSupport.dbd"
+dbLoadDatabase "$(MOTOR)/dbd/devSoftMotor.dbd"
+
+cd "${TOP}"
 dbLoadDatabase "dbd/gnaoMc.dbd"
 gnaoMc_registerRecordDeviceDriver pdbbase
 
 # Set local AMS net ID
-AdsSetLocalAMSNetID("192.168.200.7.1.1")
+AdsSetLocalAMSNetID("192.168.200.2.1.1")
 
 # gnaoMc PLC program connection parameters
 epicsEnvSet("PREFIX_ADSGNAOMC", "ADS-GNAOMC")

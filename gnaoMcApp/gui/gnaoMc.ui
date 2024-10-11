@@ -227,6 +227,58 @@
      <string>Temerature Sensor 2</string>
     </property>
    </widget>
+   <widget class="caLed" name="caled_3">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>260</y>
+      <width>71</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="ledWidth">
+     <number>35</number>
+    </property>
+    <property name="ledHeight">
+     <number>35</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ADS-GNAOMC:bSwitch2_RBV</string>
+    </property>
+    <property name="trueColor">
+     <color>
+      <red>0</red>
+      <green>255</green>
+      <blue>0</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caLed" name="caled_4">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>260</y>
+      <width>71</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="ledWidth">
+     <number>35</number>
+    </property>
+    <property name="ledHeight">
+     <number>35</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">ADS-GNAOMC:bSwitch1_RBV</string>
+    </property>
+    <property name="trueColor">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+   </widget>
   </widget>
  </widget>
  <customwidgets>

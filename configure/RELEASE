@@ -29,6 +29,7 @@ EPICS_BASE=/usr/local/epics/base
 ASYN=/usr/local/epics/synApps/support/synApps/support/asyn-R4-37
 AUTOPARAM=/usr/local/epics/base/modules/autoparamDriver
 ADS=/usr/local/epics/adsDriver
+MOTOR=/usr/local/epics/synApps/support/synApps/support/motor-R7-2-2
 
 # If using the sequencer, point SNCSEQ at its top directory:
 #SNCSEQ = $(MODULES)/seq-ver

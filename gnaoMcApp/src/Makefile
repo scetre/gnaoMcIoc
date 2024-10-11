@@ -16,10 +16,10 @@ DBD += gnaoMc.dbd
 gnaoMc_DBD += base.dbd
 
 # Include dbd files from all support applications:
-gnaoMc_DBD += asyn.dbd ads.dbd
+gnaoMc_DBD += asyn.dbd ads.dbd motorSupport.dbd devSoftMotor.dbd
 
 # Add all the support libraries needed by this IOC
-gnaoMc_LIBS += asyn ads
+gnaoMc_LIBS += asyn ads motor softMotor
 
 # gnaoMc_registerRecordDeviceDriver.cpp derives from gnaoMc.dbd
 gnaoMc_SRCS += gnaoMc_registerRecordDeviceDriver.cpp

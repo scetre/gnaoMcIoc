@@ -30,17 +30,40 @@ record(bo, "$(P):bSwitch1") {
     field(UDFS, "NO_ALARM")
 }
 
+record(bi, "$(P):bSwitch1_RBV") {
+    field(DESC, "bi recort controlling switch read back")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@asyn($(PORT) 0 0) BOOL R P=$(ADS_PORT) V=GVL_EPICS.bSwitch1")
+    field(ZNAM, "Zero")
+    field(ONAM, "One")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):bSwitch1.VAL PP") # Update the longout record with PP (process passive)
+}
+
 record(bo, "$(P):bSwitch2") {
     field(DESC, "bo record controlling switch 2")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=$(ADS_PORT) V=GVL_EPICS.bSwitch2")
     field(ZNAM, "Zero")
     field(ONAM, "One")
+    field(DOL, "$(P):bSwitch2_RBV.VAL PP")
     field(UDFS, "NO_ALARM")
 }
 
+record(bi, "$(P):bSwitch2_RBV") {
+    field(DESC, "bi recort controlling switch read back")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@asyn($(PORT) 0 0) BOOL R P=$(ADS_PORT) V=GVL_EPICS.bSwitch2")
+    field(ZNAM, "Zero")
+    field(ONAM, "One")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):bSwitch2.VAL PP") # Update the longout record with PP (process passive)
+}
+
 record(ai, "$(P):rTemperatureSensor1") {
-    field(DESC, "ai record tmonitoring temperature sensor 1")
+    field(DESC, "ai record monitoring temp sensor 1")
     field(PREC, "2")
     field(DTYP, "asynFloat64")
     field(SCAN, "I/O Intr")
@@ -49,7 +72,7 @@ record(ai, "$(P):rTemperatureSensor1") {
 }
 
 record(ai, "$(P):rTemperatureSensor2") {
-    field(DESC, "ai record tmonitoring temperature sensor 2")
+    field(DESC, "ai record monitoring temp sensor 2")
     field(PREC, "2")
     field(DTYP, "asynFloat64")
     field(SCAN, "I/O Intr")

@@ -10,3 +10,18 @@ file "gnaoTest.db" {
         { "$(P)" }
 }
 
+file "gnaoMotor.db" {
+    pattern { "P", "M" }
+        { "$(P)", "M1" }
+}
+
+file "gnaoMotor.db" {
+    pattern { "P", "M" }
+        { "$(P)", "M2" }
+}
+
+
+file "gnaoSoftMotor.db" {
+    pattern { "P", "M" }
+        { "$(P)", "M1" }
+}
