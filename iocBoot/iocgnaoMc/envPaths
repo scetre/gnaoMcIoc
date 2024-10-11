@@ -1,0 +1,7 @@
+epicsEnvSet("IOC","iocgnaoMc")
+epicsEnvSet("TOP","/home/gnao/gnaoMcIoc")
+epicsEnvSet("EPICS_BASE","/usr/local/epics/base")
+epicsEnvSet("ASYN","/usr/local/epics/synApps/support/synApps/support/asyn-R4-37")
+epicsEnvSet("AUTOPARAM","/usr/local/epics/base/modules/autoparamDriver")
+epicsEnvSet("ADS","/usr/local/epics/adsDriver")
+epicsEnvSet("MOTOR","/usr/local/epics/synApps/support/synApps/support/motor-R7-2-2")

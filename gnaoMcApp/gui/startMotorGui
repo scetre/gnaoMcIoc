@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+export CAQTDM_DISPLAY_PATH="/usr/local/epics/synApps/support/motor-R7-1/motorApp/op/ui/:/usr/local/epics/synApps/support/motor-R7-1/motorApp/op/ui/autoconvert"
+
+caQtDM -macro "P=ADS-GNAOMC:,M=$1" -noMsg motorx_more.ui
