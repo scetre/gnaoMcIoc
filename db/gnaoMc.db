@@ -117,13 +117,12 @@ record(longout, "$(P):M1:DVAL") {
 }
 
 ############################################################
-### RPM #### INLINK  use M1.SPD as example, will be replace by PLC M1.VAL
+### RPM #### INLINK 
 record(longin, "$(P):M1:RMP") {
     field(DESC, "Raw Motor Position")
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M1.SPD")
-#    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M1.RMP")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M1.RMP")
     field(UDFS, "NO_ALARM")
 }
 
@@ -133,7 +132,8 @@ record(ai, "$(P):M1:RDBL") {
     field(DESC, "Output specification")
     field(DTYP, "asynFloat64")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=GVL_EPICS.rTemperatureSensor1")
+#    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=GVL_EPICS.rTemperatureSensor1")
+    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=M1.RVAL")
 #    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=M1.RDBL")
     field(UDFS, "NO_ALARM")
 }
@@ -143,8 +143,8 @@ record(ai, "$(P):M1:RDBL") {
 record(bo, "$(P):M1:STOP") {
     field(DESC, "Stop Motor")
     field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=PLC_TC3 V=GVL_EPICS.bSwitch2")
-#    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=PLC_TC3 V=M1:STOP")
+#    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=PLC_TC3 V=GVL_EPICS.bSwitch2")
+    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=PLC_TC3 V=M1.STOP")
     field(ZNAM, "FREERUN")
     field(ONAM, "STOP")
     field(UDFS, "NO_ALARM")
@@ -191,8 +191,16 @@ record(calcout, "$(P):M1:ACCL_SYNC_M") {
     field(DESC, "Sync ACCL_RBV to M1.ACCL")
     field(INPA, "$(P):M1:ACCL_RBV.VAL")
     field(CALC, "A")             # Pass the value of ACCL_RBV directly
-    field(OUT, "$(P):M1.ACCL PP") # Update .ACCL without processing its OUT field
+    field(OUT, "$(P):M1.ACCL CA") # Update .ACCL without processing its OUT field
     field(SCAN, "Passive")      # Process when ACCL_RBV changes
+}
+
+record(calcout, "$(P):M1:ACCL_UPDATE") {
+    field(DESC, "Update ACCL from M1.ACCL")
+    field(INPA, "$(P):M1.ACCL CPP")  # Monitor writes to M1.ACCL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:ACCL PP") # Write to $(P):M1:ACCL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
 }
 
 #############################################################
@@ -233,10 +241,17 @@ record(calcout, "$(P):M1:BACC_SYNC_M") {
     field(DESC, "Sync BACC_RBV to M1.BACC")
     field(INPA, "$(P):M1:BACC_RBV.VAL")
     field(CALC, "A")             # Pass the value of BACC_RBV directly
-    field(OUT, "$(P):M1.BACC PP") # Update .BACC without processing its OUT field
+    field(OUT, "$(P):M1.BACC CA") # Update .BACC without processing its OUT field
     field(SCAN, "Passive")      # Process when BACC_RBV changes
 }
 
+record(calcout, "$(P):M1:BACC_UPDATE") {
+    field(DESC, "Update BACC from M1.BACC")
+    field(INPA, "$(P):M1.BACC CPP")  # Monitor writes to M1.BACC
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:BACC PP") # Write to $(P):M1:BACC, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 
 #############################################################
 #### BDST #### To be replaced by DOUBLE
@@ -276,10 +291,17 @@ record(calcout, "$(P):M1:BDST_SYNC_M") {
     field(DESC, "Sync BDST_RBV to M1.BDST")
     field(INPA, "$(P):M1:BDST_RBV.VAL")
     field(CALC, "A")             # Pass the value of BDST_RBV directly
-    field(OUT, "$(P):M1.BDST PP") # Update .BDST without processing its OUT field
+    field(OUT, "$(P):M1.BDST CA") # Update .BDST without processing its OUT field
     field(SCAN, "Passive")      # Process when BDST_RBV changes
 }
 
+record(calcout, "$(P):M1:BDST_UPDATE") {
+    field(DESC, "Update BDST from M1.BDST")
+    field(INPA, "$(P):M1.BDST CPP")  # Monitor writes to M1.BDST
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:BDST PP") # Write to $(P):M1:BDST, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### BVEL #### To be replaced by DOUBLE
 record(longout, "$(P):M1:BVEL") {
@@ -318,8 +340,15 @@ record(calcout, "$(P):M1:BVEL_SYNC_M") {
     field(DESC, "Sync BVEL_RBV to M1.BVEL")
     field(INPA, "$(P):M1:BVEL_RBV.VAL")
     field(CALC, "A")             # Pass the value of BVEL_RBV directly
-    field(OUT, "$(P):M1.BVEL PP") # Update .BVEL without processing its OUT field
+    field(OUT, "$(P):M1.BVEL CA") # Update .BVEL without processing its OUT field
     field(SCAN, "Passive")      # Process when BVEL_RBV changes
+}
+record(calcout, "$(P):M1:BVEL_UPDATE") {
+    field(DESC, "Update BVEL from M1.BVEL")
+    field(INPA, "$(P):M1.BVEL CPP")  # Monitor writes to M1.BVEL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:BVEL PP") # Write to $(P):M1:BVEL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
 }
 
 #############################################################
@@ -360,10 +389,17 @@ record(calcout, "$(P):M1:CNEN_SYNC_M") {
     field(DESC, "Sync CNEN_RBV to M1.CNEN")
     field(INPA, "$(P):M1:CNEN_RBV.VAL")
     field(CALC, "A")             # Pass the value of CNEN_RBV directly
-    field(OUT, "$(P):M1.CNEN PP") # Update .CNEN without processing its OUT field
+    field(OUT, "$(P):M1.CNEN CA") # Update .CNEN without processing its OUT field
     field(SCAN, "Passive")      # Process when CNEN_RBV changes
 }
 
+record(calcout, "$(P):M1:CNEN_UPDATE") {
+    field(DESC, "Update CNEN from M1.CNEN")
+    field(INPA, "$(P):M1.CNEN CPP")  # Monitor writes to M1.CNEN
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:CNEN PP") # Write to $(P):M1:CNEN, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### EGU ####
 record(stringout, "$(P):M1:EGU") {
@@ -402,8 +438,15 @@ record(calcout, "$(P):M1:EGU_SYNC_M") {
     field(DESC, "Sync EGU_RBV to M1.EGU")
     field(INPA, "$(P):M1:EGU_RBV.VAL")
     field(CALC, "A")             # Pass the value of EGU_RBV directly
-    field(OUT, "$(P):M1.EGU PP") # Update .EGU without processing its OUT field
+    field(OUT, "$(P):M1.EGU CA") # Update .EGU without processing its OUT field
     field(SCAN, "Passive")      # Process when EGU_RBV changes
+}
+record(calcout, "$(P):M1:EGU_UPDATE") {
+    field(DESC, "Update EGU from M1.EGU")
+    field(INPA, "$(P):M1.EGU CPP")  # Monitor writes to M1.EGU
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:EGU PP") # Write to $(P):M1:EGU, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
 }
 
 #############################################################
@@ -444,10 +487,17 @@ record(calcout, "$(P):M1:HOMF_SYNC_M") {
     field(DESC, "Sync HOMF_RBV to M1.HOMF")
     field(INPA, "$(P):M1:HOMF_RBV.VAL")
     field(CALC, "A")             # Pass the value of HOMF_RBV directly
-    field(OUT, "$(P):M1.HOMF PP") # Update .HOMF without processing its OUT field
+    field(OUT, "$(P):M1.HOMF CA") # Update .HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
 
+record(calcout, "$(P):M1:HOMF_UPDATE") {
+    field(DESC, "Update HOMF from M1.HOMF")
+    field(INPA, "$(P):M1.HOMF CPP")  # Monitor writes to M1.HOMF
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:HOMF PP") # Write to $(P):M1:HOMF, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### HOMR ####
 record(longout, "$(P):M1:HOMR") {
@@ -486,10 +536,17 @@ record(calcout, "$(P):M1:HOMR_SYNC_M") {
     field(DESC, "Sync HOMR_RBV to M1.HOMR")
     field(INPA, "$(P):M1:HOMR_RBV.VAL")
     field(CALC, "A")             # Pass the value of HOMR_RBV directly
-    field(OUT, "$(P):M1.HOMR PP") # Update .HOMF without processing its OUT field
+    field(OUT, "$(P):M1.HOMR CA") # Update .HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
 
+record(calcout, "$(P):M1:HOMR_UPDATE") {
+    field(DESC, "Update HOMR from M1.HOMR")
+    field(INPA, "$(P):M1.HOMR CPP")  # Monitor writes to M1.HOMR
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:HOMR PP") # Write to $(P):M1:HOMR, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### HVEL #### to be replaced by DOUBLE
 record(longout, "$(P):M1:HVEL") {
@@ -528,10 +585,17 @@ record(calcout, "$(P):M1:HVEL_SYNC_M") {
     field(DESC, "Sync HVEL_RBV to M1.HVEL")
     field(INPA, "$(P):M1:HVEL_RBV.VAL")
     field(CALC, "A")             # Pass the value of HVEL_RBV directly
-    field(OUT, "$(P):M1.HVEL PP") # Update .HOMF without processing its OUT field
+    field(OUT, "$(P):M1.HVEL CA") # Update .HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
 
+record(calcout, "$(P):M1:HVEL_UPDATE") {
+    field(DESC, "Update HVEL from M1.HVEL")
+    field(INPA, "$(P):M1.HVEL CPP")  # Monitor writes to M1.HVEL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:HVEL PP") # Write to $(P):M1:HVEL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### JAR #### to be replaced by DOUBLE
 record(longout, "$(P):M1:JAR") {
@@ -574,6 +638,13 @@ record(calcout, "$(P):M1:JAR_SYNC_M") {
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
 
+record(calcout, "$(P):M1:JAR_UPDATE") {
+    field(DESC, "Update JAR from M1.JAR")
+    field(INPA, "$(P):M1.JAR CPP")  # Monitor writes to M1.JAR
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:JAR CA") # Write to $(P):M1:JAR, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### JVEL #### to be replaced by DOUBLE
 record(longout, "$(P):M1:JVEL") {
@@ -612,10 +683,17 @@ record(calcout, "$(P):M1:JVEL_SYNC_M") {
     field(DESC, "Sync JVEL_RBV to M1.JVEL")
     field(INPA, "$(P):M1:JVEL_RBV.VAL")
     field(CALC, "A")             # Pass the value of JVEL_RBV directly
-    field(OUT, "$(P):M1.JVEL PP") # Update .HOMF without processing its OUT field
+    field(OUT, "$(P):M1.JVEL CA") # Update .HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
 
+record(calcout, "$(P):M1:JVEL_UPDATE") {
+    field(DESC, "Update JVEL from M1.JVEL")
+    field(INPA, "$(P):M1.JVEL CPP")  # Monitor writes to M1.JVEL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:JVEL PP") # Write to $(P):M1:JVEL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### S #### to be replaced by DOUBLE
 record(longout, "$(P):M1:S") {
@@ -629,7 +707,8 @@ record(longout, "$(P):M1:S") {
 record(longin, "$(P):M1:S_RBV") {
     field(DESC, "Readback of Jog Velocity")
     field(DTYP, "asynInt32")
-    field(SCAN, "I/O Intr")
+#    field(SCAN, "I/O Intr")
+    field(SCAN, "1 second")
     field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M1.SPD")
     field(UDFS, "NO_ALARM")
     field(FLNK, "$(P):M1:S_FANOUT.PROC") # Process S_SYNC when S_RBV updates
@@ -646,7 +725,7 @@ record(calcout, "$(P):M1:S_SYNC") {
     field(DESC, "Sync S_RBV to S")
     field(INPA, "$(P):M1:S_RBV.VAL")
     field(CALC, "A")             # Pass the value of S_RBV directly
-    field(OUT, "$(P):M1:S.VAL PP") # Update S without processing its OUT field
+    field(OUT, "$(P):M1:S.VAL CA") # Update S without processing its OUT field
     field(SCAN, "Passive")      # Process when S_RBV changes
 }
 
@@ -654,51 +733,116 @@ record(calcout, "$(P):M1:S_SYNC_M") {
     field(DESC, "Sync S_RBV to M1.S")
     field(INPA, "$(P):M1:S_RBV.VAL")
     field(CALC, "A")             # Pass the value of S_RBV directly
-    field(OUT, "$(P):M1.S PP") # Update .HOMF without processing its OUT field
+    field(OUT, "$(P):M1.S CA") # Update .HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
+}
+record(calcout, "$(P):M1:S_UPDATE") {
+    field(DESC, "Update S from M1.S")
+    field(INPA, "$(P):M1.S CPP")  # Monitor writes to M1.S
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M1:S PP") # Write to $(P):M1:S, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
 }
 
 #############################################################
-#### VELO #### to be replaced by DOUBLE
-record(longout, "$(P):M1:VELO") {
-    field(DESC, "Jog Velocity")
-    field(DTYP, "asynInt32")
-    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M1.VELO")
-    field(OMSL, "supervisory")
-    field(UDFS, "NO_ALARM")
-}
-
-record(longin, "$(P):M1:VELO_RBV") {
-    field(DESC, "Readback of Jog Velocity")
-    field(DTYP, "asynInt32")
-    field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M1.VELO")
-    field(UDFS, "NO_ALARM")
-    field(FLNK, "$(P):M1:VELO_FANOUT.PROC") # Process VELO_SYNC when VELO_RBV updates
-}
-
-record(fanout, "$(P):M1:VELO_FANOUT") {
-    field(DESC, "Fanout for VELO_RBV Updates")
-    field(LNK1, "$(P):M1:VELO_SYNC.PROC")   # First record to process
-    field(LNK2, "$(P):M1:VELO_SYNC_M.PROC") # Second record to process
-    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
-}
-
-record(calcout, "$(P):M1:VELO_SYNC") {
-    field(DESC, "Sync VELO_RBV to VELO")
-    field(INPA, "$(P):M1:VELO_RBV.VAL")
-    field(CALC, "A")             # Pass the value of VELO_RBV directly
-    field(OUT, "$(P):M1:VELO.VAL PP") # Update VELO without processing its OUT field
-    field(SCAN, "Passive")      # Process when VELO_RBV changes
-}
-
-record(calcout, "$(P):M1:VELO_SYNC_M") {
-    field(DESC, "Sync VELO_RBV to M1.VELO")
-    field(INPA, "$(P):M1:VELO_RBV.VAL")
-    field(CALC, "A")             # Pass the value of VELO_RBV directly
-    field(OUT, "$(P):M1.VELO PP") # Update .HOMF without processing its OUT field
-    field(SCAN, "Passive")      # Process when HOMF_RBV changes
-}
+#### SPMG ####
+#record(longout, "$(P):M1:SPMG") {
+#    field(DESC, "Stop/Pause/Move/Go")
+#    field(DTYP, "asynInt32")
+#    field(OUT, "@asyn($(PORT) 0 0) INT W P=PLC_TC3 V=M1.SPMG")
+#    field(OMSL, "supervisory")
+#    field(UDFS, "NO_ALARM")
+#}
+#
+#record(longin, "$(P):M1:SPMG_RBV") {
+#    field(DESC, "Readback of Jog Velocity")
+#    field(DTYP, "asynInt32")
+#    field(SCAN, "I/O Intr")
+#    field(INP, "@asyn($(PORT) 0 0) INT R P=PLC_TC3 V=M1.SPMG")
+#    field(UDFS, "NO_ALARM")
+#    field(FLNK, "$(P):M1:SPMG_FANOUT.PROC") # Process SPMG_SYNC when SPMG_RBV updates
+#}
+#
+#record(fanout, "$(P):M1:SPMG_FANOUT") {
+#    field(DESC, "Fanout for SPMG_RBV Updates")
+#    field(LNK1, "$(P):M1:SPMG_SYNC.PROC")   # First record to process
+#    field(LNK2, "$(P):M1:SPMG_SYNC_M.PROC") # Second record to process
+#    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+#}
+#
+#record(calcout, "$(P):M1:SPMG_SYNC") {
+#    field(DESC, "Sync SPMG_RBV to SPMG")
+#    field(INPA, "$(P):M1:SPMG_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of SPMG_RBV directly
+#    field(OUT, "$(P):M1:SPMG.VAL PP") # Update SPMG without processing its OUT field
+#    field(SCAN, "Passive")      # Process when SPMG_RBV changes
+#}
+#
+#record(calcout, "$(P):M1:SPMG_SYNC_M") {
+#    field(DESC, "Sync SPMG_RBV to M1.SPMG")
+#    field(INPA, "$(P):M1:SPMG_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of SPMG_RBV directly
+#    field(OUT, "$(P):M1.SPMG CA") # Update .HOMF without processing its OUT field
+#    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+#}
+#
+#record(calcout, "$(P):M1:SPMG_UPDATE") {
+#    field(DESC, "Update SPMG from M1.SPMG")
+#    field(INPA, "$(P):M1.SPMG CPP")  # Monitor writes to M1.SPMG
+#    field(CALC, "A")                   # Pass the value directly
+#    field(OUT, "$(P):M1:SPMG PP") # Write to $(P):M1:SPMG, triggering PLC update
+#    field(SCAN, "Passive")             # Process on demand
+#}
+#
+##############################################################
+##### VELO #### to be replaced by DOUBLE
+#record(longout, "$(P):M1:VELO") {
+#    field(DESC, "Jog Velocity")
+#    field(DTYP, "asynInt32")
+#    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M1.VELO")
+#    field(OMSL, "supervisory")
+#    field(UDFS, "NO_ALARM")
+#}
+#
+#record(longin, "$(P):M1:VELO_RBV") {
+#    field(DESC, "Readback of Jog Velocity")
+#    field(DTYP, "asynInt32")
+#    field(SCAN, "I/O Intr")
+#    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M1.VELO")
+#    field(UDFS, "NO_ALARM")
+#    field(FLNK, "$(P):M1:VELO_FANOUT.PROC") # Process VELO_SYNC when VELO_RBV updates
+#}
+#
+#record(fanout, "$(P):M1:VELO_FANOUT") {
+#    field(DESC, "Fanout for VELO_RBV Updates")
+#    field(LNK1, "$(P):M1:VELO_SYNC.PROC")   # First record to process
+#    field(LNK2, "$(P):M1:VELO_SYNC_M.PROC") # Second record to process
+#    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+#}
+#
+#record(calcout, "$(P):M1:VELO_SYNC") {
+#    field(DESC, "Sync VELO_RBV to VELO")
+#    field(INPA, "$(P):M1:VELO_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of VELO_RBV directly
+#    field(OUT, "$(P):M1:VELO.VAL PP") # Update VELO without processing its OUT field
+#    field(SCAN, "Passive")      # Process when VELO_RBV changes
+#}
+#
+#record(calcout, "$(P):M1:VELO_SYNC_M") {
+#    field(DESC, "Sync VELO_RBV to M1.VELO")
+#    field(INPA, "$(P):M1:VELO_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of VELO_RBV directly
+#    field(OUT, "$(P):M1.VELO CA") # Update .HOMF without processing its OUT field
+#    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+#}
+#
+#record(calcout, "$(P):M1:VELO_UPDATE") {
+#    field(DESC, "Update VELO from M1.VELO")
+#    field(INPA, "$(P):M1.VELO CPP")  # Monitor writes to M1.VELO
+#    field(CALC, "A")                   # Pass the value directly
+#    field(OUT, "$(P):M1:VELO PP") # Write to $(P):M1:VELO, triggering PLC update
+#    field(SCAN, "Passive")             # Process on demand
+#}
 #### LINK channels ####
 
 ############################################################
@@ -735,13 +879,12 @@ record(longout, "$(P):M2:DVAL") {
 }
 
 ############################################################
-### RPM #### INLINK  use M2.SPD as example, will be replace by PLC M2.VAL
+### RPM #### INLINK 
 record(longin, "$(P):M2:RMP") {
     field(DESC, "Raw Motor Position")
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M2.SPD")
-#    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M2.RMP")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M2.RMP")
     field(UDFS, "NO_ALARM")
 }
 
@@ -751,7 +894,8 @@ record(ai, "$(P):M2:RDBL") {
     field(DESC, "Output specification")
     field(DTYP, "asynFloat64")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=GVL_EPICS.rTemperatureSensor1")
+#    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=GVL_EPICS.rTemperatureSensor1")
+    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=M2.RVAL")
 #    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=M2.RDBL")
     field(UDFS, "NO_ALARM")
 }
@@ -761,8 +905,8 @@ record(ai, "$(P):M2:RDBL") {
 record(bo, "$(P):M2:STOP") {
     field(DESC, "Stop Motor")
     field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=PLC_TC3 V=GVL_EPICS.bSwitch2")
-#    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=PLC_TC3 V=M2:STOP")
+#    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=PLC_TC3 V=GVL_EPICS.bSwitch2")
+    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=PLC_TC3 V=M2.STOP")
     field(ZNAM, "FREERUN")
     field(ONAM, "STOP")
     field(UDFS, "NO_ALARM")
@@ -809,8 +953,16 @@ record(calcout, "$(P):M2:ACCL_SYNC_M") {
     field(DESC, "Sync ACCL_RBV to M2.ACCL")
     field(INPA, "$(P):M2:ACCL_RBV.VAL")
     field(CALC, "A")             # Pass the value of ACCL_RBV directly
-    field(OUT, "$(P):M2.ACCL PP") # Update .ACCL without processing its OUT field
+    field(OUT, "$(P):M2.ACCL CA") # Update .ACCL without processing its OUT field
     field(SCAN, "Passive")      # Process when ACCL_RBV changes
+}
+
+record(calcout, "$(P):M2:ACCL_UPDATE") {
+    field(DESC, "Update ACCL from M2.ACCL")
+    field(INPA, "$(P):M2.ACCL CPP")  # Monitor writes to M2.ACCL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:ACCL PP") # Write to $(P):M2:ACCL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
 }
 
 #############################################################
@@ -851,10 +1003,17 @@ record(calcout, "$(P):M2:BACC_SYNC_M") {
     field(DESC, "Sync BACC_RBV to M2.BACC")
     field(INPA, "$(P):M2:BACC_RBV.VAL")
     field(CALC, "A")             # Pass the value of BACC_RBV directly
-    field(OUT, "$(P):M2.BACC PP") # Update .BACC without processing its OUT field
+    field(OUT, "$(P):M2.BACC CA") # Update .BACC without processing its OUT field
     field(SCAN, "Passive")      # Process when BACC_RBV changes
 }
 
+record(calcout, "$(P):M2:BACC_UPDATE") {
+    field(DESC, "Update BACC from M2.BACC")
+    field(INPA, "$(P):M2.BACC CPP")  # Monitor writes to M2.BACC
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:BACC PP") # Write to $(P):M2:BACC, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 
 #############################################################
 #### BDST #### To be replaced by DOUBLE
@@ -894,10 +1053,17 @@ record(calcout, "$(P):M2:BDST_SYNC_M") {
     field(DESC, "Sync BDST_RBV to M2.BDST")
     field(INPA, "$(P):M2:BDST_RBV.VAL")
     field(CALC, "A")             # Pass the value of BDST_RBV directly
-    field(OUT, "$(P):M2.BDST PP") # Update .BDST without processing its OUT field
+    field(OUT, "$(P):M2.BDST CA") # Update .BDST without processing its OUT field
     field(SCAN, "Passive")      # Process when BDST_RBV changes
 }
 
+record(calcout, "$(P):M2:BDST_UPDATE") {
+    field(DESC, "Update BDST from M2.BDST")
+    field(INPA, "$(P):M2.BDST CPP")  # Monitor writes to M2.BDST
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:BDST PP") # Write to $(P):M2:BDST, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### BVEL #### To be replaced by DOUBLE
 record(longout, "$(P):M2:BVEL") {
@@ -936,8 +1102,15 @@ record(calcout, "$(P):M2:BVEL_SYNC_M") {
     field(DESC, "Sync BVEL_RBV to M2.BVEL")
     field(INPA, "$(P):M2:BVEL_RBV.VAL")
     field(CALC, "A")             # Pass the value of BVEL_RBV directly
-    field(OUT, "$(P):M2.BVEL PP") # Update .BVEL without processing its OUT field
+    field(OUT, "$(P):M2.BVEL CA") # Update .BVEL without processing its OUT field
     field(SCAN, "Passive")      # Process when BVEL_RBV changes
+}
+record(calcout, "$(P):M2:BVEL_UPDATE") {
+    field(DESC, "Update BVEL from M2.BVEL")
+    field(INPA, "$(P):M2.BVEL CPP")  # Monitor writes to M2.BVEL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:BVEL PP") # Write to $(P):M2:BVEL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
 }
 
 #############################################################
@@ -978,10 +1151,17 @@ record(calcout, "$(P):M2:CNEN_SYNC_M") {
     field(DESC, "Sync CNEN_RBV to M2.CNEN")
     field(INPA, "$(P):M2:CNEN_RBV.VAL")
     field(CALC, "A")             # Pass the value of CNEN_RBV directly
-    field(OUT, "$(P):M2.CNEN PP") # Update .CNEN without processing its OUT field
+    field(OUT, "$(P):M2.CNEN CA") # Update .CNEN without processing its OUT field
     field(SCAN, "Passive")      # Process when CNEN_RBV changes
 }
 
+record(calcout, "$(P):M2:CNEN_UPDATE") {
+    field(DESC, "Update CNEN from M2.CNEN")
+    field(INPA, "$(P):M2.CNEN CPP")  # Monitor writes to M2.CNEN
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:CNEN PP") # Write to $(P):M2:CNEN, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### EGU ####
 record(stringout, "$(P):M2:EGU") {
@@ -1020,8 +1200,15 @@ record(calcout, "$(P):M2:EGU_SYNC_M") {
     field(DESC, "Sync EGU_RBV to M2.EGU")
     field(INPA, "$(P):M2:EGU_RBV.VAL")
     field(CALC, "A")             # Pass the value of EGU_RBV directly
-    field(OUT, "$(P):M2.EGU PP") # Update .EGU without processing its OUT field
+    field(OUT, "$(P):M2.EGU CA") # Update .EGU without processing its OUT field
     field(SCAN, "Passive")      # Process when EGU_RBV changes
+}
+record(calcout, "$(P):M2:EGU_UPDATE") {
+    field(DESC, "Update EGU from M2.EGU")
+    field(INPA, "$(P):M2.EGU CPP")  # Monitor writes to M2.EGU
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:EGU PP") # Write to $(P):M2:EGU, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
 }
 
 #############################################################
@@ -1062,10 +1249,17 @@ record(calcout, "$(P):M2:HOMF_SYNC_M") {
     field(DESC, "Sync HOMF_RBV to M2.HOMF")
     field(INPA, "$(P):M2:HOMF_RBV.VAL")
     field(CALC, "A")             # Pass the value of HOMF_RBV directly
-    field(OUT, "$(P):M2.HOMF PP") # Update .HOMF without processing its OUT field
+    field(OUT, "$(P):M2.HOMF CA") # Update .HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
 
+record(calcout, "$(P):M2:HOMF_UPDATE") {
+    field(DESC, "Update HOMF from M2.HOMF")
+    field(INPA, "$(P):M2.HOMF CPP")  # Monitor writes to M2.HOMF
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:HOMF PP") # Write to $(P):M2:HOMF, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### HOMR ####
 record(longout, "$(P):M2:HOMR") {
@@ -1104,10 +1298,17 @@ record(calcout, "$(P):M2:HOMR_SYNC_M") {
     field(DESC, "Sync HOMR_RBV to M2.HOMR")
     field(INPA, "$(P):M2:HOMR_RBV.VAL")
     field(CALC, "A")             # Pass the value of HOMR_RBV directly
-    field(OUT, "$(P):M2.HOMR PP") # Update .HOMF without processing its OUT field
+    field(OUT, "$(P):M2.HOMR CA") # Update .HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
 
+record(calcout, "$(P):M2:HOMR_UPDATE") {
+    field(DESC, "Update HOMR from M2.HOMR")
+    field(INPA, "$(P):M2.HOMR CPP")  # Monitor writes to M2.HOMR
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:HOMR PP") # Write to $(P):M2:HOMR, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### HVEL #### to be replaced by DOUBLE
 record(longout, "$(P):M2:HVEL") {
@@ -1146,10 +1347,17 @@ record(calcout, "$(P):M2:HVEL_SYNC_M") {
     field(DESC, "Sync HVEL_RBV to M2.HVEL")
     field(INPA, "$(P):M2:HVEL_RBV.VAL")
     field(CALC, "A")             # Pass the value of HVEL_RBV directly
-    field(OUT, "$(P):M2.HVEL PP") # Update .HOMF without processing its OUT field
+    field(OUT, "$(P):M2.HVEL CA") # Update .HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
 
+record(calcout, "$(P):M2:HVEL_UPDATE") {
+    field(DESC, "Update HVEL from M2.HVEL")
+    field(INPA, "$(P):M2.HVEL CPP")  # Monitor writes to M2.HVEL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:HVEL PP") # Write to $(P):M2:HVEL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### JAR #### to be replaced by DOUBLE
 record(longout, "$(P):M2:JAR") {
@@ -1192,6 +1400,13 @@ record(calcout, "$(P):M2:JAR_SYNC_M") {
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
 
+record(calcout, "$(P):M2:JAR_UPDATE") {
+    field(DESC, "Update JAR from M2.JAR")
+    field(INPA, "$(P):M2.JAR CPP")  # Monitor writes to M2.JAR
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:JAR CA") # Write to $(P):M2:JAR, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### JVEL #### to be replaced by DOUBLE
 record(longout, "$(P):M2:JVEL") {
@@ -1230,10 +1445,17 @@ record(calcout, "$(P):M2:JVEL_SYNC_M") {
     field(DESC, "Sync JVEL_RBV to M2.JVEL")
     field(INPA, "$(P):M2:JVEL_RBV.VAL")
     field(CALC, "A")             # Pass the value of JVEL_RBV directly
-    field(OUT, "$(P):M2.JVEL PP") # Update .HOMF without processing its OUT field
+    field(OUT, "$(P):M2.JVEL CA") # Update .HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
 
+record(calcout, "$(P):M2:JVEL_UPDATE") {
+    field(DESC, "Update JVEL from M2.JVEL")
+    field(INPA, "$(P):M2.JVEL CPP")  # Monitor writes to M2.JVEL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:JVEL PP") # Write to $(P):M2:JVEL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
 #############################################################
 #### S #### to be replaced by DOUBLE
 record(longout, "$(P):M2:S") {
@@ -1247,7 +1469,8 @@ record(longout, "$(P):M2:S") {
 record(longin, "$(P):M2:S_RBV") {
     field(DESC, "Readback of Jog Velocity")
     field(DTYP, "asynInt32")
-    field(SCAN, "I/O Intr")
+#    field(SCAN, "I/O Intr")
+    field(SCAN, "1 second")
     field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M2.SPD")
     field(UDFS, "NO_ALARM")
     field(FLNK, "$(P):M2:S_FANOUT.PROC") # Process S_SYNC when S_RBV updates
@@ -1264,7 +1487,7 @@ record(calcout, "$(P):M2:S_SYNC") {
     field(DESC, "Sync S_RBV to S")
     field(INPA, "$(P):M2:S_RBV.VAL")
     field(CALC, "A")             # Pass the value of S_RBV directly
-    field(OUT, "$(P):M2:S.VAL PP") # Update S without processing its OUT field
+    field(OUT, "$(P):M2:S.VAL CA") # Update S without processing its OUT field
     field(SCAN, "Passive")      # Process when S_RBV changes
 }
 
@@ -1272,51 +1495,878 @@ record(calcout, "$(P):M2:S_SYNC_M") {
     field(DESC, "Sync S_RBV to M2.S")
     field(INPA, "$(P):M2:S_RBV.VAL")
     field(CALC, "A")             # Pass the value of S_RBV directly
-    field(OUT, "$(P):M2.S PP") # Update .HOMF without processing its OUT field
+    field(OUT, "$(P):M2.S CA") # Update .HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
+}
+record(calcout, "$(P):M2:S_UPDATE") {
+    field(DESC, "Update S from M2.S")
+    field(INPA, "$(P):M2.S CPP")  # Monitor writes to M2.S
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M2:S PP") # Write to $(P):M2:S, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
 }
 
 #############################################################
-#### VELO #### to be replaced by DOUBLE
-record(longout, "$(P):M2:VELO") {
-    field(DESC, "Jog Velocity")
+#### SPMG ####
+#record(longout, "$(P):M2:SPMG") {
+#    field(DESC, "Stop/Pause/Move/Go")
+#    field(DTYP, "asynInt32")
+#    field(OUT, "@asyn($(PORT) 0 0) INT W P=PLC_TC3 V=M2.SPMG")
+#    field(OMSL, "supervisory")
+#    field(UDFS, "NO_ALARM")
+#}
+#
+#record(longin, "$(P):M2:SPMG_RBV") {
+#    field(DESC, "Readback of Jog Velocity")
+#    field(DTYP, "asynInt32")
+#    field(SCAN, "I/O Intr")
+#    field(INP, "@asyn($(PORT) 0 0) INT R P=PLC_TC3 V=M2.SPMG")
+#    field(UDFS, "NO_ALARM")
+#    field(FLNK, "$(P):M2:SPMG_FANOUT.PROC") # Process SPMG_SYNC when SPMG_RBV updates
+#}
+#
+#record(fanout, "$(P):M2:SPMG_FANOUT") {
+#    field(DESC, "Fanout for SPMG_RBV Updates")
+#    field(LNK1, "$(P):M2:SPMG_SYNC.PROC")   # First record to process
+#    field(LNK2, "$(P):M2:SPMG_SYNC_M.PROC") # Second record to process
+#    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+#}
+#
+#record(calcout, "$(P):M2:SPMG_SYNC") {
+#    field(DESC, "Sync SPMG_RBV to SPMG")
+#    field(INPA, "$(P):M2:SPMG_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of SPMG_RBV directly
+#    field(OUT, "$(P):M2:SPMG.VAL PP") # Update SPMG without processing its OUT field
+#    field(SCAN, "Passive")      # Process when SPMG_RBV changes
+#}
+#
+#record(calcout, "$(P):M2:SPMG_SYNC_M") {
+#    field(DESC, "Sync SPMG_RBV to M2.SPMG")
+#    field(INPA, "$(P):M2:SPMG_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of SPMG_RBV directly
+#    field(OUT, "$(P):M2.SPMG CA") # Update .HOMF without processing its OUT field
+#    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+#}
+#
+#record(calcout, "$(P):M2:SPMG_UPDATE") {
+#    field(DESC, "Update SPMG from M2.SPMG")
+#    field(INPA, "$(P):M2.SPMG CPP")  # Monitor writes to M2.SPMG
+#    field(CALC, "A")                   # Pass the value directly
+#    field(OUT, "$(P):M2:SPMG PP") # Write to $(P):M2:SPMG, triggering PLC update
+#    field(SCAN, "Passive")             # Process on demand
+#}
+#
+##############################################################
+##### VELO #### to be replaced by DOUBLE
+#record(longout, "$(P):M2:VELO") {
+#    field(DESC, "Jog Velocity")
+#    field(DTYP, "asynInt32")
+#    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M2.VELO")
+#    field(OMSL, "supervisory")
+#    field(UDFS, "NO_ALARM")
+#}
+#
+#record(longin, "$(P):M2:VELO_RBV") {
+#    field(DESC, "Readback of Jog Velocity")
+#    field(DTYP, "asynInt32")
+#    field(SCAN, "I/O Intr")
+#    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M2.VELO")
+#    field(UDFS, "NO_ALARM")
+#    field(FLNK, "$(P):M2:VELO_FANOUT.PROC") # Process VELO_SYNC when VELO_RBV updates
+#}
+#
+#record(fanout, "$(P):M2:VELO_FANOUT") {
+#    field(DESC, "Fanout for VELO_RBV Updates")
+#    field(LNK1, "$(P):M2:VELO_SYNC.PROC")   # First record to process
+#    field(LNK2, "$(P):M2:VELO_SYNC_M.PROC") # Second record to process
+#    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+#}
+#
+#record(calcout, "$(P):M2:VELO_SYNC") {
+#    field(DESC, "Sync VELO_RBV to VELO")
+#    field(INPA, "$(P):M2:VELO_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of VELO_RBV directly
+#    field(OUT, "$(P):M2:VELO.VAL PP") # Update VELO without processing its OUT field
+#    field(SCAN, "Passive")      # Process when VELO_RBV changes
+#}
+#
+#record(calcout, "$(P):M2:VELO_SYNC_M") {
+#    field(DESC, "Sync VELO_RBV to M2.VELO")
+#    field(INPA, "$(P):M2:VELO_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of VELO_RBV directly
+#    field(OUT, "$(P):M2.VELO CA") # Update .HOMF without processing its OUT field
+#    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+#}
+#
+#record(calcout, "$(P):M2:VELO_UPDATE") {
+#    field(DESC, "Update VELO from M2.VELO")
+#    field(INPA, "$(P):M2.VELO CPP")  # Monitor writes to M2.VELO
+#    field(CALC, "A")                   # Pass the value directly
+#    field(OUT, "$(P):M2:VELO PP") # Write to $(P):M2:VELO, triggering PLC update
+#    field(SCAN, "Passive")             # Process on demand
+#}
+#### LINK channels ####
+
+############################################################
+### MOVING #### INLINK  TMP: use switch status, will be replace by PLC M3.MOVING
+record(bi, "$(P):M3:MOVING") {
+    field(DESC, "Moving Status")
     field(DTYP, "asynInt32")
-    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M2.VELO")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@asyn($(PORT) 0 0) BOOL R P=PLC_TC3 V=GVL_EPICS.bSwitch2")
+#    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=M3.MOVING")
+    field(ZNAM, "MOVING")
+    field(ONAM, "IN POS")
+    field(UDFS, "NO_ALARM")
+}
+
+############################################################
+### VAL #### INLINK  TMP: use temperature as example, will be replace by PLC M3.VAL
+record(ai, "$(P):M3:VAL") {
+    field(DESC, "Output specification")
+    field(DTYP, "asynFloat64")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=GVL_EPICS.rTemperatureSensor2")
+#    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=M3.VAL")
+    field(UDFS, "NO_ALARM")
+}
+
+############################################################
+### DVAL #### OUTLINK
+record(longout, "$(P):M3:DVAL") {
+    field(DESC, "Stop Motor")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M3.DVAL")
+    field(UDFS, "NO_ALARM")
+}
+
+############################################################
+### RPM #### INLINK 
+record(longin, "$(P):M3:RMP") {
+    field(DESC, "Raw Motor Position")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M3.RMP")
+    field(UDFS, "NO_ALARM")
+}
+
+############################################################
+### RDBL #### INLINK  TMP: use temperature as example, will be replace by PLC M3.RDBL
+record(ai, "$(P):M3:RDBL") {
+    field(DESC, "Output specification")
+    field(DTYP, "asynFloat64")
+    field(SCAN, "I/O Intr")
+#    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=GVL_EPICS.rTemperatureSensor1")
+    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=M3.RVAL")
+#    field(INP, "@asyn($(PORT) 0 0) REAL R P=PLC_TC3 V=M3.RDBL")
+    field(UDFS, "NO_ALARM")
+}
+
+############################################################
+### STOP #### OUTLINK TMP: use switch as example, will be replace by PLC M3.STOP
+record(bo, "$(P):M3:STOP") {
+    field(DESC, "Stop Motor")
+    field(DTYP, "asynInt32")
+#    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=PLC_TC3 V=GVL_EPICS.bSwitch2")
+    field(OUT,  "@asyn($(PORT) 0 0) BOOL W P=PLC_TC3 V=M3.STOP")
+    field(ZNAM, "FREERUN")
+    field(ONAM, "STOP")
+    field(UDFS, "NO_ALARM")
+}
+
+
+#### NON LINK CHANNEL ####
+
+#############################################################
+#### ACCL #### To be replaced by DOUBLE
+record(longout, "$(P):M3:ACCL") {
+    field(DESC, "Seconds to Velocity")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M3.ACCL")
     field(OMSL, "supervisory")
     field(UDFS, "NO_ALARM")
 }
 
-record(longin, "$(P):M2:VELO_RBV") {
-    field(DESC, "Readback of Jog Velocity")
+record(longin, "$(P):M3:ACCL_RBV") {
+    field(DESC, "Readback of Seconds to Velocity")
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M2.VELO")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M3.ACCL")
     field(UDFS, "NO_ALARM")
-    field(FLNK, "$(P):M2:VELO_FANOUT.PROC") # Process VELO_SYNC when VELO_RBV updates
+    field(FLNK, "$(P):M3:ACCL_FANOUT.PROC") # Process ACCL_SYNC when ACCL_RBV updates
 }
 
-record(fanout, "$(P):M2:VELO_FANOUT") {
-    field(DESC, "Fanout for VELO_RBV Updates")
-    field(LNK1, "$(P):M2:VELO_SYNC.PROC")   # First record to process
-    field(LNK2, "$(P):M2:VELO_SYNC_M.PROC") # Second record to process
+record(fanout, "$(P):M3:ACCL_FANOUT") {
+    field(DESC, "Fanout for ACCL_RBV Updates")
+    field(LNK1, "$(P):M3:ACCL_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:ACCL_SYNC_M.PROC") # Second record to process
     # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
 }
 
-record(calcout, "$(P):M2:VELO_SYNC") {
-    field(DESC, "Sync VELO_RBV to VELO")
-    field(INPA, "$(P):M2:VELO_RBV.VAL")
-    field(CALC, "A")             # Pass the value of VELO_RBV directly
-    field(OUT, "$(P):M2:VELO.VAL PP") # Update VELO without processing its OUT field
-    field(SCAN, "Passive")      # Process when VELO_RBV changes
+record(calcout, "$(P):M3:ACCL_SYNC") {
+    field(DESC, "Sync ACCL_RBV to ACCL")
+    field(INPA, "$(P):M3:ACCL_RBV.VAL")
+    field(CALC, "A")             # Pass the value of ACCL_RBV directly
+    field(OUT, "$(P):M3:ACCL.VAL PP") # Update ACCL without processing its OUT field
+    field(SCAN, "Passive")      # Process when ACCL_RBV changes
 }
 
-record(calcout, "$(P):M2:VELO_SYNC_M") {
-    field(DESC, "Sync VELO_RBV to M2.VELO")
-    field(INPA, "$(P):M2:VELO_RBV.VAL")
-    field(CALC, "A")             # Pass the value of VELO_RBV directly
-    field(OUT, "$(P):M2.VELO PP") # Update .HOMF without processing its OUT field
+record(calcout, "$(P):M3:ACCL_SYNC_M") {
+    field(DESC, "Sync ACCL_RBV to M3.ACCL")
+    field(INPA, "$(P):M3:ACCL_RBV.VAL")
+    field(CALC, "A")             # Pass the value of ACCL_RBV directly
+    field(OUT, "$(P):M3.ACCL CA") # Update .ACCL without processing its OUT field
+    field(SCAN, "Passive")      # Process when ACCL_RBV changes
+}
+
+record(calcout, "$(P):M3:ACCL_UPDATE") {
+    field(DESC, "Update ACCL from M3.ACCL")
+    field(INPA, "$(P):M3.ACCL CPP")  # Monitor writes to M3.ACCL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:ACCL PP") # Write to $(P):M3:ACCL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+
+#############################################################
+#### BACC #### To be replaced by DOUBLE
+record(longout, "$(P):M3:BACC") {
+    field(DESC, "BL Seconds to Velocity")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M3.BACC")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(longin, "$(P):M3:BACC_RBV") {
+    field(DESC, "Readback of BL Seconds to Velocity")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M3.BACC")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:BACC_FANOUT.PROC") # Process BACC_SYNC when BACC_RBV updates
+}
+
+record(fanout, "$(P):M3:BACC_FANOUT") {
+    field(DESC, "Fanout for BACC_RBV Updates")
+    field(LNK1, "$(P):M3:BACC_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:BACC_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:BACC_SYNC") {
+    field(DESC, "Sync BACC_RBV to BACC")
+    field(INPA, "$(P):M3:BACC_RBV.VAL")
+    field(CALC, "A")             # Pass the value of BACC_RBV directly
+    field(OUT, "$(P):M3:BACC.VAL PP") # Update BACC without processing its OUT field
+    field(SCAN, "Passive")      # Process when BACC_RBV changes
+}
+
+record(calcout, "$(P):M3:BACC_SYNC_M") {
+    field(DESC, "Sync BACC_RBV to M3.BACC")
+    field(INPA, "$(P):M3:BACC_RBV.VAL")
+    field(CALC, "A")             # Pass the value of BACC_RBV directly
+    field(OUT, "$(P):M3.BACC CA") # Update .BACC without processing its OUT field
+    field(SCAN, "Passive")      # Process when BACC_RBV changes
+}
+
+record(calcout, "$(P):M3:BACC_UPDATE") {
+    field(DESC, "Update BACC from M3.BACC")
+    field(INPA, "$(P):M3.BACC CPP")  # Monitor writes to M3.BACC
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:BACC PP") # Write to $(P):M3:BACC, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+
+#############################################################
+#### BDST #### To be replaced by DOUBLE
+record(longout, "$(P):M3:BDST") {
+    field(DESC, "BL Distance")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M3.BDST")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(longin, "$(P):M3:BDST_RBV") {
+    field(DESC, "Readback of BL Distance")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M3.BDST")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:BDST_FANOUT.PROC") # Process BDST_SYNC when BDST_RBV updates
+}
+
+record(fanout, "$(P):M3:BDST_FANOUT") {
+    field(DESC, "Fanout for BDST_RBV Updates")
+    field(LNK1, "$(P):M3:BDST_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:BDST_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:BDST_SYNC") {
+    field(DESC, "Sync BDST_RBV to BDST")
+    field(INPA, "$(P):M3:BDST_RBV.VAL")
+    field(CALC, "A")             # Pass the value of BDST_RBV directly
+    field(OUT, "$(P):M3:BDST.VAL PP") # Update BDST without processing its OUT field
+    field(SCAN, "Passive")      # Process when BDST_RBV changes
+}
+
+record(calcout, "$(P):M3:BDST_SYNC_M") {
+    field(DESC, "Sync BDST_RBV to M3.BDST")
+    field(INPA, "$(P):M3:BDST_RBV.VAL")
+    field(CALC, "A")             # Pass the value of BDST_RBV directly
+    field(OUT, "$(P):M3.BDST CA") # Update .BDST without processing its OUT field
+    field(SCAN, "Passive")      # Process when BDST_RBV changes
+}
+
+record(calcout, "$(P):M3:BDST_UPDATE") {
+    field(DESC, "Update BDST from M3.BDST")
+    field(INPA, "$(P):M3.BDST CPP")  # Monitor writes to M3.BDST
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:BDST PP") # Write to $(P):M3:BDST, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+#############################################################
+#### BVEL #### To be replaced by DOUBLE
+record(longout, "$(P):M3:BVEL") {
+    field(DESC, "BL Distance")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M3.BVEL")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(longin, "$(P):M3:BVEL_RBV") {
+    field(DESC, "Readback of BL Distance")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M3.BVEL")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:BVEL_FANOUT.PROC") # Process BVEL_SYNC when BVEL_RBV updates
+}
+
+record(fanout, "$(P):M3:BVEL_FANOUT") {
+    field(DESC, "Fanout for BVEL_RBV Updates")
+    field(LNK1, "$(P):M3:BVEL_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:BVEL_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:BVEL_SYNC") {
+    field(DESC, "Sync BVEL_RBV to BVEL")
+    field(INPA, "$(P):M3:BVEL_RBV.VAL")
+    field(CALC, "A")             # Pass the value of BVEL_RBV directly
+    field(OUT, "$(P):M3:BVEL.VAL PP") # Update BVEL without processing its OUT field
+    field(SCAN, "Passive")      # Process when BVEL_RBV changes
+}
+
+record(calcout, "$(P):M3:BVEL_SYNC_M") {
+    field(DESC, "Sync BVEL_RBV to M3.BVEL")
+    field(INPA, "$(P):M3:BVEL_RBV.VAL")
+    field(CALC, "A")             # Pass the value of BVEL_RBV directly
+    field(OUT, "$(P):M3.BVEL CA") # Update .BVEL without processing its OUT field
+    field(SCAN, "Passive")      # Process when BVEL_RBV changes
+}
+record(calcout, "$(P):M3:BVEL_UPDATE") {
+    field(DESC, "Update BVEL from M3.BVEL")
+    field(INPA, "$(P):M3.BVEL CPP")  # Monitor writes to M3.BVEL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:BVEL PP") # Write to $(P):M3:BVEL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+
+#############################################################
+#### CNEN ####
+record(longout, "$(P):M3:CNEN") {
+    field(DESC, "Enable Device")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) INT W P=PLC_TC3 V=M3.CNEN")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(longin, "$(P):M3:CNEN_RBV") {
+    field(DESC, "Readback of Enable Device")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) INT R P=PLC_TC3 V=M3.CNEN")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:CNEN_FANOUT.PROC") # Process CNEN_SYNC when CNEN_RBV updates
+}
+
+record(fanout, "$(P):M3:CNEN_FANOUT") {
+    field(DESC, "Fanout for CNEN_RBV Updates")
+    field(LNK1, "$(P):M3:CNEN_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:CNEN_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:CNEN_SYNC") {
+    field(DESC, "Sync CNEN_RBV to CNEN")
+    field(INPA, "$(P):M3:CNEN_RBV.VAL")
+    field(CALC, "A")             # Pass the value of CNEN_RBV directly
+    field(OUT, "$(P):M3:CNEN.VAL PP") # Update CNEN without processing its OUT field
+    field(SCAN, "Passive")      # Process when CNEN_RBV changes
+}
+
+record(calcout, "$(P):M3:CNEN_SYNC_M") {
+    field(DESC, "Sync CNEN_RBV to M3.CNEN")
+    field(INPA, "$(P):M3:CNEN_RBV.VAL")
+    field(CALC, "A")             # Pass the value of CNEN_RBV directly
+    field(OUT, "$(P):M3.CNEN CA") # Update .CNEN without processing its OUT field
+    field(SCAN, "Passive")      # Process when CNEN_RBV changes
+}
+
+record(calcout, "$(P):M3:CNEN_UPDATE") {
+    field(DESC, "Update CNEN from M3.CNEN")
+    field(INPA, "$(P):M3.CNEN CPP")  # Monitor writes to M3.CNEN
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:CNEN PP") # Write to $(P):M3:CNEN, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+#############################################################
+#### EGU ####
+record(stringout, "$(P):M3:EGU") {
+    field(DESC, "Engineering Unit")
+    field(DTYP, "asynOctetWrite")
+    field(OUT, "@asyn($(PORT) 0 0) STRING N=2 W P=PLC_TC3 V=M3.EGU")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(stringin, "$(P):M3:EGU_RBV") {
+    field(DESC, "Readback of Engineering Unit")
+    field(DTYP, "asynOctetRead")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) STRING N=2 R P=PLC_TC3 V=M3.EGU")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:EGU_FANOUT.PROC") # Process EGU_SYNC when EGU_RBV updates
+}
+
+record(fanout, "$(P):M3:EGU_FANOUT") {
+    field(DESC, "Fanout for EGU_RBV Updates")
+    field(LNK1, "$(P):M3:EGU_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:EGU_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:EGU_SYNC") {
+    field(DESC, "Sync EGU_RBV to EGU")
+    field(INPA, "$(P):M3:EGU_RBV.VAL")
+    field(CALC, "A")             # Pass the value of EGU_RBV directly
+    field(OUT, "$(P):M3:EGU.VAL PP") # Update EGU without processing its OUT field
+    field(SCAN, "Passive")      # Process when EGU_RBV changes
+}
+
+record(calcout, "$(P):M3:EGU_SYNC_M") {
+    field(DESC, "Sync EGU_RBV to M3.EGU")
+    field(INPA, "$(P):M3:EGU_RBV.VAL")
+    field(CALC, "A")             # Pass the value of EGU_RBV directly
+    field(OUT, "$(P):M3.EGU CA") # Update .EGU without processing its OUT field
+    field(SCAN, "Passive")      # Process when EGU_RBV changes
+}
+record(calcout, "$(P):M3:EGU_UPDATE") {
+    field(DESC, "Update EGU from M3.EGU")
+    field(INPA, "$(P):M3.EGU CPP")  # Monitor writes to M3.EGU
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:EGU PP") # Write to $(P):M3:EGU, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+
+#############################################################
+#### HOMF ####
+record(longout, "$(P):M3:HOMF") {
+    field(DESC, "Home Forward")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) INT W P=PLC_TC3 V=M3.HOMF")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(longin, "$(P):M3:HOMF_RBV") {
+    field(DESC, "Readback of Home Forward")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) INT R P=PLC_TC3 V=M3.HOMF")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:HOMF_FANOUT.PROC") # Process HOMF_SYNC when HOMF_RBV updates
+}
+
+record(fanout, "$(P):M3:HOMF_FANOUT") {
+    field(DESC, "Fanout for HOMF_RBV Updates")
+    field(LNK1, "$(P):M3:HOMF_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:HOMF_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:HOMF_SYNC") {
+    field(DESC, "Sync HOMF_RBV to HOMF")
+    field(INPA, "$(P):M3:HOMF_RBV.VAL")
+    field(CALC, "A")             # Pass the value of HOMF_RBV directly
+    field(OUT, "$(P):M3:HOMF.VAL PP") # Update HOMF without processing its OUT field
     field(SCAN, "Passive")      # Process when HOMF_RBV changes
 }
+
+record(calcout, "$(P):M3:HOMF_SYNC_M") {
+    field(DESC, "Sync HOMF_RBV to M3.HOMF")
+    field(INPA, "$(P):M3:HOMF_RBV.VAL")
+    field(CALC, "A")             # Pass the value of HOMF_RBV directly
+    field(OUT, "$(P):M3.HOMF CA") # Update .HOMF without processing its OUT field
+    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+}
+
+record(calcout, "$(P):M3:HOMF_UPDATE") {
+    field(DESC, "Update HOMF from M3.HOMF")
+    field(INPA, "$(P):M3.HOMF CPP")  # Monitor writes to M3.HOMF
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:HOMF PP") # Write to $(P):M3:HOMF, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+#############################################################
+#### HOMR ####
+record(longout, "$(P):M3:HOMR") {
+    field(DESC, "Home Reverse")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) INT W P=PLC_TC3 V=M3.HOMR")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(longin, "$(P):M3:HOMR_RBV") {
+    field(DESC, "Readback of HOME Reverse")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) INT R P=PLC_TC3 V=M3.HOMR")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:HOMR_FANOUT.PROC") # Process HOMR_SYNC when HOMR_RBV updates
+}
+
+record(fanout, "$(P):M3:HOMR_FANOUT") {
+    field(DESC, "Fanout for HOMR_RBV Updates")
+    field(LNK1, "$(P):M3:HOMR_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:HOMR_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:HOMR_SYNC") {
+    field(DESC, "Sync HOMR_RBV to HOMR")
+    field(INPA, "$(P):M3:HOMR_RBV.VAL")
+    field(CALC, "A")             # Pass the value of HOMR_RBV directly
+    field(OUT, "$(P):M3:HOMR.VAL PP") # Update HOMR without processing its OUT field
+    field(SCAN, "Passive")      # Process when HOMR_RBV changes
+}
+
+record(calcout, "$(P):M3:HOMR_SYNC_M") {
+    field(DESC, "Sync HOMR_RBV to M3.HOMR")
+    field(INPA, "$(P):M3:HOMR_RBV.VAL")
+    field(CALC, "A")             # Pass the value of HOMR_RBV directly
+    field(OUT, "$(P):M3.HOMR CA") # Update .HOMF without processing its OUT field
+    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+}
+
+record(calcout, "$(P):M3:HOMR_UPDATE") {
+    field(DESC, "Update HOMR from M3.HOMR")
+    field(INPA, "$(P):M3.HOMR CPP")  # Monitor writes to M3.HOMR
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:HOMR PP") # Write to $(P):M3:HOMR, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+#############################################################
+#### HVEL #### to be replaced by DOUBLE
+record(longout, "$(P):M3:HVEL") {
+    field(DESC, "Home Velocity")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M3.HVEL")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(longin, "$(P):M3:HVEL_RBV") {
+    field(DESC, "Readback of Home Velocity")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M3.HVEL")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:HVEL_FANOUT.PROC") # Process HVEL_SYNC when HVEL_RBV updates
+}
+
+record(fanout, "$(P):M3:HVEL_FANOUT") {
+    field(DESC, "Fanout for HVEL_RBV Updates")
+    field(LNK1, "$(P):M3:HVEL_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:HVEL_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:HVEL_SYNC") {
+    field(DESC, "Sync HVEL_RBV to HVEL")
+    field(INPA, "$(P):M3:HVEL_RBV.VAL")
+    field(CALC, "A")             # Pass the value of HVEL_RBV directly
+    field(OUT, "$(P):M3:HVEL.VAL PP") # Update HVEL without processing its OUT field
+    field(SCAN, "Passive")      # Process when HVEL_RBV changes
+}
+
+record(calcout, "$(P):M3:HVEL_SYNC_M") {
+    field(DESC, "Sync HVEL_RBV to M3.HVEL")
+    field(INPA, "$(P):M3:HVEL_RBV.VAL")
+    field(CALC, "A")             # Pass the value of HVEL_RBV directly
+    field(OUT, "$(P):M3.HVEL CA") # Update .HOMF without processing its OUT field
+    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+}
+
+record(calcout, "$(P):M3:HVEL_UPDATE") {
+    field(DESC, "Update HVEL from M3.HVEL")
+    field(INPA, "$(P):M3.HVEL CPP")  # Monitor writes to M3.HVEL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:HVEL PP") # Write to $(P):M3:HVEL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+#############################################################
+#### JAR #### to be replaced by DOUBLE
+record(longout, "$(P):M3:JAR") {
+    field(DESC, "Jog Acceleration")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M3.JAR")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(longin, "$(P):M3:JAR_RBV") {
+    field(DESC, "Readback of Jog Acceleration")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M3.JAR")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:JAR_FANOUT.PROC") # Process JAR_SYNC when JAR_RBV updates
+}
+
+record(fanout, "$(P):M3:JAR_FANOUT") {
+    field(DESC, "Fanout for JAR_RBV Updates")
+    field(LNK1, "$(P):M3:JAR_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:JAR_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:JAR_SYNC") {
+    field(DESC, "Sync JAR_RBV to JAR")
+    field(INPA, "$(P):M3:JAR_RBV.VAL")
+    field(CALC, "A")             # Pass the value of JAR_RBV directly
+    field(OUT, "$(P):M3:JAR.VAL PP") # Update JAR without processing its OUT field
+    field(SCAN, "Passive")      # Process when JAR_RBV changes
+}
+
+record(calcout, "$(P):M3:JAR_SYNC_M") {
+    field(DESC, "Sync JAR_RBV to M3.JAR")
+    field(INPA, "$(P):M3:JAR_RBV.VAL")
+    field(CALC, "A")             # Pass the value of JAR_RBV directly
+    field(OUT, "$(P):M3.JAR PP") # Update .HOMF without processing its OUT field
+    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+}
+
+record(calcout, "$(P):M3:JAR_UPDATE") {
+    field(DESC, "Update JAR from M3.JAR")
+    field(INPA, "$(P):M3.JAR CPP")  # Monitor writes to M3.JAR
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:JAR CA") # Write to $(P):M3:JAR, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+#############################################################
+#### JVEL #### to be replaced by DOUBLE
+record(longout, "$(P):M3:JVEL") {
+    field(DESC, "Jog Velocity")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M3.JVEL")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(longin, "$(P):M3:JVEL_RBV") {
+    field(DESC, "Readback of Jog Velocity")
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M3.JVEL")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:JVEL_FANOUT.PROC") # Process JVEL_SYNC when JVEL_RBV updates
+}
+
+record(fanout, "$(P):M3:JVEL_FANOUT") {
+    field(DESC, "Fanout for JVEL_RBV Updates")
+    field(LNK1, "$(P):M3:JVEL_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:JVEL_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:JVEL_SYNC") {
+    field(DESC, "Sync JVEL_RBV to JVEL")
+    field(INPA, "$(P):M3:JVEL_RBV.VAL")
+    field(CALC, "A")             # Pass the value of JVEL_RBV directly
+    field(OUT, "$(P):M3:JVEL.VAL PP") # Update JVEL without processing its OUT field
+    field(SCAN, "Passive")      # Process when JVEL_RBV changes
+}
+
+record(calcout, "$(P):M3:JVEL_SYNC_M") {
+    field(DESC, "Sync JVEL_RBV to M3.JVEL")
+    field(INPA, "$(P):M3:JVEL_RBV.VAL")
+    field(CALC, "A")             # Pass the value of JVEL_RBV directly
+    field(OUT, "$(P):M3.JVEL CA") # Update .HOMF without processing its OUT field
+    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+}
+
+record(calcout, "$(P):M3:JVEL_UPDATE") {
+    field(DESC, "Update JVEL from M3.JVEL")
+    field(INPA, "$(P):M3.JVEL CPP")  # Monitor writes to M3.JVEL
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:JVEL PP") # Write to $(P):M3:JVEL, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+#############################################################
+#### S #### to be replaced by DOUBLE
+record(longout, "$(P):M3:S") {
+    field(DESC, "Jog Velocity")
+    field(DTYP, "asynInt32")
+    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M3.SPD")
+    field(OMSL, "supervisory")
+    field(UDFS, "NO_ALARM")
+}
+
+record(longin, "$(P):M3:S_RBV") {
+    field(DESC, "Readback of Jog Velocity")
+    field(DTYP, "asynInt32")
+#    field(SCAN, "I/O Intr")
+    field(SCAN, "1 second")
+    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M3.SPD")
+    field(UDFS, "NO_ALARM")
+    field(FLNK, "$(P):M3:S_FANOUT.PROC") # Process S_SYNC when S_RBV updates
+}
+
+record(fanout, "$(P):M3:S_FANOUT") {
+    field(DESC, "Fanout for S_RBV Updates")
+    field(LNK1, "$(P):M3:S_SYNC.PROC")   # First record to process
+    field(LNK2, "$(P):M3:S_SYNC_M.PROC") # Second record to process
+    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+}
+
+record(calcout, "$(P):M3:S_SYNC") {
+    field(DESC, "Sync S_RBV to S")
+    field(INPA, "$(P):M3:S_RBV.VAL")
+    field(CALC, "A")             # Pass the value of S_RBV directly
+    field(OUT, "$(P):M3:S.VAL CA") # Update S without processing its OUT field
+    field(SCAN, "Passive")      # Process when S_RBV changes
+}
+
+record(calcout, "$(P):M3:S_SYNC_M") {
+    field(DESC, "Sync S_RBV to M3.S")
+    field(INPA, "$(P):M3:S_RBV.VAL")
+    field(CALC, "A")             # Pass the value of S_RBV directly
+    field(OUT, "$(P):M3.S CA") # Update .HOMF without processing its OUT field
+    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+}
+record(calcout, "$(P):M3:S_UPDATE") {
+    field(DESC, "Update S from M3.S")
+    field(INPA, "$(P):M3.S CPP")  # Monitor writes to M3.S
+    field(CALC, "A")                   # Pass the value directly
+    field(OUT, "$(P):M3:S PP") # Write to $(P):M3:S, triggering PLC update
+    field(SCAN, "Passive")             # Process on demand
+}
+
+#############################################################
+#### SPMG ####
+#record(longout, "$(P):M3:SPMG") {
+#    field(DESC, "Stop/Pause/Move/Go")
+#    field(DTYP, "asynInt32")
+#    field(OUT, "@asyn($(PORT) 0 0) INT W P=PLC_TC3 V=M3.SPMG")
+#    field(OMSL, "supervisory")
+#    field(UDFS, "NO_ALARM")
+#}
+#
+#record(longin, "$(P):M3:SPMG_RBV") {
+#    field(DESC, "Readback of Jog Velocity")
+#    field(DTYP, "asynInt32")
+#    field(SCAN, "I/O Intr")
+#    field(INP, "@asyn($(PORT) 0 0) INT R P=PLC_TC3 V=M3.SPMG")
+#    field(UDFS, "NO_ALARM")
+#    field(FLNK, "$(P):M3:SPMG_FANOUT.PROC") # Process SPMG_SYNC when SPMG_RBV updates
+#}
+#
+#record(fanout, "$(P):M3:SPMG_FANOUT") {
+#    field(DESC, "Fanout for SPMG_RBV Updates")
+#    field(LNK1, "$(P):M3:SPMG_SYNC.PROC")   # First record to process
+#    field(LNK2, "$(P):M3:SPMG_SYNC_M.PROC") # Second record to process
+#    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+#}
+#
+#record(calcout, "$(P):M3:SPMG_SYNC") {
+#    field(DESC, "Sync SPMG_RBV to SPMG")
+#    field(INPA, "$(P):M3:SPMG_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of SPMG_RBV directly
+#    field(OUT, "$(P):M3:SPMG.VAL PP") # Update SPMG without processing its OUT field
+#    field(SCAN, "Passive")      # Process when SPMG_RBV changes
+#}
+#
+#record(calcout, "$(P):M3:SPMG_SYNC_M") {
+#    field(DESC, "Sync SPMG_RBV to M3.SPMG")
+#    field(INPA, "$(P):M3:SPMG_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of SPMG_RBV directly
+#    field(OUT, "$(P):M3.SPMG CA") # Update .HOMF without processing its OUT field
+#    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+#}
+#
+#record(calcout, "$(P):M3:SPMG_UPDATE") {
+#    field(DESC, "Update SPMG from M3.SPMG")
+#    field(INPA, "$(P):M3.SPMG CPP")  # Monitor writes to M3.SPMG
+#    field(CALC, "A")                   # Pass the value directly
+#    field(OUT, "$(P):M3:SPMG PP") # Write to $(P):M3:SPMG, triggering PLC update
+#    field(SCAN, "Passive")             # Process on demand
+#}
+#
+##############################################################
+##### VELO #### to be replaced by DOUBLE
+#record(longout, "$(P):M3:VELO") {
+#    field(DESC, "Jog Velocity")
+#    field(DTYP, "asynInt32")
+#    field(OUT, "@asyn($(PORT) 0 0) DINT W P=PLC_TC3 V=M3.VELO")
+#    field(OMSL, "supervisory")
+#    field(UDFS, "NO_ALARM")
+#}
+#
+#record(longin, "$(P):M3:VELO_RBV") {
+#    field(DESC, "Readback of Jog Velocity")
+#    field(DTYP, "asynInt32")
+#    field(SCAN, "I/O Intr")
+#    field(INP, "@asyn($(PORT) 0 0) DINT R P=PLC_TC3 V=M3.VELO")
+#    field(UDFS, "NO_ALARM")
+#    field(FLNK, "$(P):M3:VELO_FANOUT.PROC") # Process VELO_SYNC when VELO_RBV updates
+#}
+#
+#record(fanout, "$(P):M3:VELO_FANOUT") {
+#    field(DESC, "Fanout for VELO_RBV Updates")
+#    field(LNK1, "$(P):M3:VELO_SYNC.PROC")   # First record to process
+#    field(LNK2, "$(P):M3:VELO_SYNC_M.PROC") # Second record to process
+#    # Add more LNK fields as needed (LNK3, LNK4, etc., up to LNK6)
+#}
+#
+#record(calcout, "$(P):M3:VELO_SYNC") {
+#    field(DESC, "Sync VELO_RBV to VELO")
+#    field(INPA, "$(P):M3:VELO_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of VELO_RBV directly
+#    field(OUT, "$(P):M3:VELO.VAL PP") # Update VELO without processing its OUT field
+#    field(SCAN, "Passive")      # Process when VELO_RBV changes
+#}
+#
+#record(calcout, "$(P):M3:VELO_SYNC_M") {
+#    field(DESC, "Sync VELO_RBV to M3.VELO")
+#    field(INPA, "$(P):M3:VELO_RBV.VAL")
+#    field(CALC, "A")             # Pass the value of VELO_RBV directly
+#    field(OUT, "$(P):M3.VELO CA") # Update .HOMF without processing its OUT field
+#    field(SCAN, "Passive")      # Process when HOMF_RBV changes
+#}
+#
+#record(calcout, "$(P):M3:VELO_UPDATE") {
+#    field(DESC, "Update VELO from M3.VELO")
+#    field(INPA, "$(P):M3.VELO CPP")  # Monitor writes to M3.VELO
+#    field(CALC, "A")                   # Pass the value directly
+#    field(OUT, "$(P):M3:VELO PP") # Write to $(P):M3:VELO, triggering PLC update
+#    field(SCAN, "Passive")             # Process on demand
+#}
 
 record(motor, "$(P):M1") {
     field(DTYP, "Soft Channel")         # Soft Channel Motor
@@ -1325,7 +2375,7 @@ record(motor, "$(P):M1") {
 ##    field(OMLS,  "$(P):M1:")          #  
     field(OUT,  "$(P):M1:DVAL PP MS")       # Set motor position EGU
 #    field(RDBL,  "$(P):M1:RDBL")      # Readback Location 
-    field(RINP,  "$(P):M1:RMP")        # Raw Motor Position
+#    field(RINP,  "$(P):M1:RMP")        # Raw Motor Position
 ##    field(RLINK,  "$(P):M1:")          #  
     field(STOO,  "$(P):M1:STOP.VAL NPP MS")      # Stop Motor 
 }

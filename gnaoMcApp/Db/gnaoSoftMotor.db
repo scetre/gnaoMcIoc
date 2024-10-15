@@ -6,7 +6,7 @@ record(motor, "$(P):$(M)") {
 ##    field(OMLS,  "$(P):$(M):")          #  
     field(OUT,  "$(P):$(M):DVAL PP MS")       # Set motor position EGU
 #    field(RDBL,  "$(P):$(M):RDBL")      # Readback Location 
-    field(RINP,  "$(P):$(M):RMP")        # Raw Motor Position
+#    field(RINP,  "$(P):$(M):RMP")        # Raw Motor Position
 ##    field(RLINK,  "$(P):$(M):")          #  
     field(STOO,  "$(P):$(M):STOP.VAL NPP MS")      # Stop Motor 
 }
