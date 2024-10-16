@@ -1,6 +1,5 @@
-# SPDX-FileCopyrightText: 2022 Cosylab d.d.
-#
-# SPDX-License-Identifier: MIT
+# author: S.Cetre Wakea Consulting
+# October 2024
 
 global {PORT="$(PORT)"}
 global {ADS_PORT="PLC_TC3"}
@@ -10,22 +9,47 @@ file "gnaoTest.db" {
         { "$(P)" }
 }
 
+############################################################
+# MOTOR M1
+############################################################
+# Create ADS interfaces
 file "gnaoMotor.db" {
     pattern { "P", "M" }
         { "$(P)", "M1" }
 }
 
+# Create EPICS softMotor
+file "gnaoSoftMotor.db" {
+    pattern { "P", "M" }
+        { "$(P)", "M1" }
+}
+
+############################################################
+# MOTOR M2
+############################################################
+# Create ADS interfaces
 file "gnaoMotor.db" {
     pattern { "P", "M" }
         { "$(P)", "M2" }
 }
 
+# Create EPICS softMotor
+file "gnaoSoftMotor.db" {
+    pattern { "P", "M" }
+        { "$(P)", "M2" }
+}
+
+############################################################
+# MOTOR M3
+############################################################
+# Create ADS interfaces
 file "gnaoMotor.db" {
     pattern { "P", "M" }
         { "$(P)", "M3" }
 }
 
+# Create EPICS softMotor
 file "gnaoSoftMotor.db" {
     pattern { "P", "M" }
-        { "$(P)", "M1" }
+        { "$(P)", "M3" }
 }

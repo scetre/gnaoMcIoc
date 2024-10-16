@@ -1,5 +1,8 @@
 #!../../bin/linux-x86_64/gnaoMc
 
+# author: S.Cetre Wakea Consulting
+# October 2024
+
 < envPaths
 
 ## Set EPICS_DB_INCLUDE_PATH to help find .dbd files
@@ -15,7 +18,7 @@ dbLoadDatabase "dbd/gnaoMc.dbd"
 gnaoMc_registerRecordDeviceDriver pdbbase
 
 # Set local AMS net ID
-AdsSetLocalAMSNetID("192.168.200.9.1.1")
+AdsSetLocalAMSNetID("192.168.200.6.1.1")
 
 # gnaoMc PLC program connection parameters
 epicsEnvSet("PREFIX_ADSGNAOMC", "ADS-GNAOMC")
